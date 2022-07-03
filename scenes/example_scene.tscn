@@ -21,6 +21,11 @@ extents = Vector2( 16, 0.5 )
 0/tile_mode = 0
 0/occluder_offset = Vector2( 16, 16 )
 0/navigation_offset = Vector2( 16, 16 )
+0/shape_offset = Vector2( 16, 0.5 )
+0/shape_transform = Transform2D( 1, 0, 0, 1, 16, 0.5 )
+0/shape = SubResource( 1 )
+0/shape_one_way = true
+0/shape_one_way_margin = 1.0
 0/shapes = [ {
 "autotile_coord": Vector2( 0, 0 ),
 "one_way": true,
@@ -100,16 +105,12 @@ format = 1
 tile_data = PoolIntArray( 196665, 0, 0, 327729, 0, 0, 393266, 0, 0, 458819, 0, 0, 524334, 0, 0, 524342, 0, 0, 524343, 0, 0, 524353, 0, 0, 524357, 0, 0, 589874, 0, 0, 589887, 0, 0, 589895, 0, 0, 655408, 0, 0, 655421, 0, 0, 655433, 0, 0, 720950, 0, 0, 720955, 0, 0, 720971, 0, 0, 786509, 0, 0, 851988, 0, 0, 851989, 0, 0, 851990, 0, 0, 851994, 0, 0, 851995, 0, 0, 851996, 0, 0, 851997, 0, 0, 852001, 0, 0, 852002, 0, 0 )
 
 [node name="Player" type="KinematicBody2D" parent="."]
-editor/display_folded = true
 position = Vector2( 535.987, 417.635 )
 collision_layer = 2
 collision_mask = 13
 script = ExtResource( 4 )
-x_acceleration = 30
-x_decceleration = 30
 
 [node name="Player Sprite" type="AnimatedSprite" parent="Player"]
-editor/display_folded = true
 frames = SubResource( 3 )
 script = ExtResource( 7 )
 
@@ -132,7 +133,6 @@ drag_margin_right = 0.0
 drag_margin_bottom = 0.0
 
 [node name="Face" type="Area2D" parent="Player"]
-editor/display_folded = true
 collision_layer = 2
 
 [node name="Face Box" type="CollisionShape2D" parent="Player/Face"]
@@ -140,6 +140,5 @@ position = Vector2( 8, 0 )
 rotation = 1.5708
 shape = SubResource( 7 )
 one_way_collision = true
-
 [connection signal="body_entered" from="Player/Face" to="Player" method="_on_wall"]
 [connection signal="body_exited" from="Player/Face" to="Player" method="_off_wall"]

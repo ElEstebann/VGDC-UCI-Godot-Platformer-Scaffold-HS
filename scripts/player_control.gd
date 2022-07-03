@@ -6,12 +6,12 @@ extends KinematicBody2D
 #	of tiles. That's why it's better to write everything out.
 
 export var gravity: float = 2000.0			#Use "export" to create script variables. Gravity is gravity.
-export var x_acceleration: int = 20			#Acceleration of player. Use for slow startups.
-export var x_decceleration: int = 20		#Decceleration of player. Use for sliding.
+export var x_acceleration: int = 30			#Acceleration of player. Use for slow startups.
+export var x_decceleration: int = 30		#Decceleration of player. Use for sliding.
 export var max_speed: float = 500.0			#Maximum speed of the player.
 export var jump_speed: float = 600.0		#Alters jump height.
 export var can_wall_jump: bool = true		#Allows wall jumping.
-export var phantom_jump_frames: int = 3		#Time you can still jump after walking off ground. 0 disables it.
+export var coyote_time: int = 3				#Time you can still jump after walking off ground. 0 disables it.
 
 enum direction {LEFT, RIGHT, NONE}			#Enum for where player is buffering input.
 
@@ -25,15 +25,17 @@ onready var collider_node = get_node("Face/Face Box")
 
 #The below two functions are called by the engine. delta is the time elapsed between frames.
 
-func _process(delta):						#_process is called by the engine once every "frame", default 60 fps.
+func _process(_delta):						#_process is called by the engine once every "frame", default 60 fps.
 	if is_dead():
 		die_and_respawn()
 
-func _physics_process(delta):				#Unlike _process, Godot makes sure physics stuff is ready to be
-	change_turn_state()						#	used before calling _physics_process.
-	record_last_touched_ground()
+func _physics_process(delta):				#Unlike _process, Godot makes sure physics stuff is ready to be used
+	change_turn_state()						#	before calling _physics_process. Specifically, the code here is
+	record_last_touched_ground()			#	always called every 1/60th of a second, regardless of framedrops.
 	move(delta)								#Previous functions edit the velocity of the player object.
-	move_and_slide(velocity, Vector2(0, -1))#	move_and_slide actually moves the object.
+	var _i = move_and_slide(velocity, Vector2(0, -1))#	move_and_slide actually moves the object.
+	#Use an underscore before variables to get rid of the unused warning. This also gets rid of
+	#	the "unused function value" warning
 
 #The functions below are called by _process and _physics_process.
 
@@ -56,15 +58,17 @@ func is_dead():								#Death conditions can be set here.
 		return get_position().y > 1010 or get_slide_collision(0).collider.collision_layer == 4
 	return get_position().y > 1010
 
-func die_and_respawn():					#Currently resets scene.
-	get_tree().reload_current_scene()
+func die_and_respawn():						#Currently resets scene.
+	var _i = get_tree().reload_current_scene()
+	#Use an underscore before variables to get rid of the unused warning. This also gets rid of
+	#	the "unused function value" warning
 
 func move(delta):							#Controls movement.
 	stop_if_collided()
 	velocity.y += delta * gravity
 	if press_up() and (is_on_floor() or can_phantom()):
 		jump(jump_speed)
-		last_touched_ground = phantom_jump_frames + 1
+		last_touched_ground = coyote_time + 1
 	if press_down() and is_on_floor() and get_slide_collision(0).collider.collision_layer == 8:
 		position.y += 1						#The allows ducking through platforms.
 	match turn_state:
@@ -92,7 +96,7 @@ func wall_jump():							#Performs a wall-jump.
 
 func record_last_touched_ground():			#Records the last time the player touched the ground. This is
 	if is_on_floor():						#	used for the phantom jump only and can be deleted if you do
-		last_touched_ground = 0			#	not need that feature.
+		last_touched_ground = 0				#	not need that feature.
 	else:
 		last_touched_ground += 1
 
@@ -151,7 +155,7 @@ func bounce_y():							#Reverses y velocity.
 	velocity.y = -velocity.y
 
 func can_phantom():							#Checks if player can phantom jump.
-	return last_touched_ground <= phantom_jump_frames
+	return last_touched_ground <= coyote_time
 
 #Generic input functions that can go in any file.
 
