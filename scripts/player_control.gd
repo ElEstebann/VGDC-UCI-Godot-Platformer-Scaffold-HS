@@ -5,13 +5,13 @@ extends KinematicBody2D
 #	especially when using tiles. The player object often bounces on the floor because of the jagged edges
 #	of tiles. That's why it's better to write everything out.
 
-export var gravity: float = 2000.0			#Use "export" to create script variables. Gravity is gravity.
-export var x_acceleration: int = 30			#Acceleration of player. Use for slow startups.
-export var x_decceleration: int = 30		#Decceleration of player. Use for sliding.
-export var max_speed: float = 500.0			#Maximum speed of the player.
-export var jump_speed: float = 600.0		#Alters jump height.
+export (float, 500, 4000, 100) var gravity = 2000.0			#Use "export" to create script variables. Gravity is gravity.
+export (int, 2, 80, 2) var x_acceleration = 30			#Acceleration of player. Use for slow startups.
+export (int, 2, 80, 2) var x_decceleration = 30		#Decceleration of player. Use for sliding.
+export (float, 200, 1900, 100) var max_speed = 500.0			#Maximum speed of the player.
+export (float, 300, 850, 150) var jump_speed = 600.0		#Alters jump height.
 export var can_wall_jump: bool = true		#Allows wall jumping.
-export var coyote_time: int = 3				#Time you can still jump after walking off ground. 0 disables it.
+export (float, 0, 3, 0.5) var coyote_time = 3				#Time you can still jump after walking off ground. 0 disables it.
 
 enum direction {LEFT, RIGHT, NONE}			#Enum for where player is buffering input.
 
