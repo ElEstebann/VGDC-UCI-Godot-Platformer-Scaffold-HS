@@ -20,7 +20,7 @@ var velocity = Vector2()					#Velocity of the player object to move next frame.
 var last_touched_ground: int = 0			#Number of frames ago ground was touched.
 var turn_state = direction.NONE				#What direction player should move.
 var is_on_wall: bool = false				#Whether this node is on a wall.
-
+var slowed: bool = false
 #Below variable is created when scene is ready. It represents the collider "Face Box" on "Face".
 onready var collider_node = get_node("Face/Face Box")
 
@@ -93,6 +93,7 @@ func wall_jump():							#Performs a wall-jump.
 			velocity.x = -max_speed
 			turn_state = direction.LEFT
 			jump(jump_speed)
+			
 		direction.LEFT:
 			velocity.x = max_speed
 			turn_state = direction.RIGHT
@@ -121,13 +122,25 @@ func turn_face_box():						#Moves the "Face Box" node to be on the face, even af
 		collider_node.position.x = -abs(collider_node.position.x)
 		collider_node.rotation_degrees = -90
 
-func _on_wall(body):						#Called when a wall enters this object. See Node tab of Face.
-	if body.get_name() == "Tiles":
-		is_on_wall = true					#There's a method with this name, but this is a property, so no overwrite.
+func _on_wall(body):
+						#Called when a wall enters this object. See Node tab of Face.
+	if body.get_name() == "Tiles" or body.get_name() == "SlowTiles":
+		is_on_wall = true
+					#There's a method with this name, but this is a property, so no overwrite.
 
 func _off_wall(body):						#Called when a wall exits this object. See Node tab of Face.
-	if body.get_name() == "Tiles":
+	if body.get_name() == "Tiles" or body.get_name() == "SlowTiles":
 		is_on_wall = false
+	
+		
+func _on_floor(body):
+	if body.get_name() == "SlowTiles":
+		slowed = true
+		
+func _off_floor(body):
+	if body.get_name() == "SlowTiles":
+		slowed = false
+		last_touched_ground = coyote_time + 1
 
 func accelerate_x(rate):					#Accelerates x based on parameter value.
 	if rate > 0 and velocity.x <= max_speed:
@@ -144,7 +157,8 @@ func deccelerate_x(rate):					#Deccelerates x if speed is high enough. Otherwise
 		velocity.x += rate
 
 func jump(speed):							#Jumps at a rate.
-	velocity.y = -speed
+	if not slowed:
+		velocity.y = -speed
 
 func stop_x():								#Stops x motion.
 	velocity.x = 0
