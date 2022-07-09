@@ -12,6 +12,7 @@ export (float, 200, 1900, 100) var max_speed = 500.0			#Maximum speed of the pla
 export (float, 300, 850, 150) var jump_speed = 600.0		#Alters jump height.
 export var can_wall_jump: bool = true		#Allows wall jumping.
 export (float, 0, 3, 0.5) var coyote_time = 3				#Time you can still jump after walking off ground. 0 disables it.
+export (float) var kill_floor = 1010  # the minimum y value
 
 enum direction {LEFT, RIGHT, NONE}			#Enum for where player is buffering input.
 
@@ -54,9 +55,12 @@ func change_turn_state():					#Makes the player face where they turned and moves
 		turn_state = direction.NONE
 
 func is_dead():								#Death conditions can be set here.
-	if get_slide_count() > 0:
-		return get_position().y > 1010 or get_slide_collision(0).collider.collision_layer == 4
-	return get_position().y > 1010
+	if get_position().y > kill_floor:
+		return true
+	for i in get_slide_count():
+		if get_slide_collision(i).collider.collision_layer & 0b100:  # layer 3
+			return true
+	return false
 
 func die_and_respawn():						#Currently resets scene.
 	var _i = get_tree().reload_current_scene()
